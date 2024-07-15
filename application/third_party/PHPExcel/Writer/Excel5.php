@@ -1,9 +1,9 @@
 <?php
 
 /**
- * PHPExcel
+ * PHPExcel_Writer_Excel5
  *
- * Copyright (c) 2006 - 2014 PHPExcel
+ * Copyright (c) 2006 - 2015 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,149 +21,143 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel_Writer_Excel5
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- * @license	http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version	1.8.0, 2014-03-02
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ * @version    ##VERSION##, ##DATE##
  */
-
-/**
- * PHPExcel_Writer_Excel5
- *
- * @category   PHPExcel
- * @package    PHPExcel_Writer_Excel5
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- */
-class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExcel_Writer_IWriter {
-
+class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExcel_Writer_IWriter
+{
     /**
      * PHPExcel object
      *
      * @var PHPExcel
      */
-    private $_phpExcel;
+    private $phpExcel;
 
     /**
      * Total number of shared strings in workbook
      *
      * @var int
      */
-    private $_str_total = 0;
+    private $strTotal = 0;
 
     /**
      * Number of unique shared strings in workbook
      *
      * @var int
      */
-    private $_str_unique = 0;
+    private $strUnique = 0;
 
     /**
      * Array of unique shared strings in workbook
      *
      * @var array
      */
-    private $_str_table = array();
+    private $strTable = array();
 
     /**
      * Color cache. Mapping between RGB value and color index.
      *
      * @var array
      */
-    private $_colors;
+    private $colors;
 
     /**
      * Formula parser
      *
      * @var PHPExcel_Writer_Excel5_Parser
      */
-    private $_parser;
+    private $parser;
 
     /**
      * Identifier clusters for drawings. Used in MSODRAWINGGROUP record.
      *
      * @var array
      */
-    private $_IDCLs;
+    private $IDCLs;
 
     /**
      * Basic OLE object summary information
      *
      * @var array
      */
-    private $_summaryInformation;
+    private $summaryInformation;
 
     /**
      * Extended OLE object document summary information
      *
      * @var array
      */
-    private $_documentSummaryInformation;
+    private $documentSummaryInformation;
 
     /**
      * Create a new PHPExcel_Writer_Excel5
      *
-     * @param	PHPExcel	$phpExcel	PHPExcel object
+     * @param    PHPExcel    $phpExcel    PHPExcel object
      */
-    public function __construct(PHPExcel $phpExcel) {
-        $this->_phpExcel = $phpExcel;
+    public function __construct(PHPExcel $phpExcel)
+    {
+        $this->phpExcel    = $phpExcel;
 
-        $this->_parser = new PHPExcel_Writer_Excel5_Parser();
+        $this->parser        = new PHPExcel_Writer_Excel5_Parser();
     }
 
     /**
      * Save PHPExcel to file
      *
-     * @param	string		$pFilename
-     * @throws	PHPExcel_Writer_Exception
+     * @param    string        $pFilename
+     * @throws    PHPExcel_Writer_Exception
      */
-    public function save($pFilename = null) {
+    public function save($pFilename = null)
+    {
 
         // garbage collect
-        $this->_phpExcel->garbageCollect();
+        $this->phpExcel->garbageCollect();
 
-        $saveDebugLog = PHPExcel_Calculation::getInstance($this->_phpExcel)->getDebugLog()->getWriteDebugLog();
-        PHPExcel_Calculation::getInstance($this->_phpExcel)->getDebugLog()->setWriteDebugLog(FALSE);
+        $saveDebugLog = PHPExcel_Calculation::getInstance($this->phpExcel)->getDebugLog()->getWriteDebugLog();
+        PHPExcel_Calculation::getInstance($this->phpExcel)->getDebugLog()->setWriteDebugLog(false);
         $saveDateReturnType = PHPExcel_Calculation_Functions::getReturnDateType();
         PHPExcel_Calculation_Functions::setReturnDateType(PHPExcel_Calculation_Functions::RETURNDATE_EXCEL);
 
         // initialize colors array
-        $this->_colors = array();
+        $this->colors = array();
 
         // Initialise workbook writer
-        $this->_writerWorkbook = new PHPExcel_Writer_Excel5_Workbook($this->_phpExcel, $this->_str_total, $this->_str_unique, $this->_str_table, $this->_colors, $this->_parser);
+        $this->writerWorkbook = new PHPExcel_Writer_Excel5_Workbook($this->phpExcel, $this->strTotal, $this->strUnique, $this->strTable, $this->colors, $this->parser);
 
         // Initialise worksheet writers
-        $countSheets = $this->_phpExcel->getSheetCount();
+        $countSheets = $this->phpExcel->getSheetCount();
         for ($i = 0; $i < $countSheets; ++$i) {
-            $this->_writerWorksheets[$i] = new PHPExcel_Writer_Excel5_Worksheet($this->_str_total, $this->_str_unique, $this->_str_table, $this->_colors, $this->_parser, $this->_preCalculateFormulas, $this->_phpExcel->getSheet($i));
+            $this->writerWorksheets[$i] = new PHPExcel_Writer_Excel5_Worksheet($this->strTotal, $this->strUnique, $this->strTable, $this->colors, $this->parser, $this->preCalculateFormulas, $this->phpExcel->getSheet($i));
         }
 
         // build Escher objects. Escher objects for workbooks needs to be build before Escher object for workbook.
-        $this->_buildWorksheetEschers();
-        $this->_buildWorkbookEscher();
+        $this->buildWorksheetEschers();
+        $this->buildWorkbookEscher();
 
         // add 15 identical cell style Xfs
         // for now, we use the first cellXf instead of cellStyleXf
-        $cellXfCollection = $this->_phpExcel->getCellXfCollection();
+        $cellXfCollection = $this->phpExcel->getCellXfCollection();
         for ($i = 0; $i < 15; ++$i) {
-            $this->_writerWorkbook->addXfWriter($cellXfCollection[0], true);
+            $this->writerWorkbook->addXfWriter($cellXfCollection[0], true);
         }
 
         // add all the cell Xfs
-        foreach ($this->_phpExcel->getCellXfCollection() as $style) {
-            $this->_writerWorkbook->addXfWriter($style, false);
+        foreach ($this->phpExcel->getCellXfCollection() as $style) {
+            $this->writerWorkbook->addXfWriter($style, false);
         }
 
         // add fonts from rich text eleemnts
         for ($i = 0; $i < $countSheets; ++$i) {
-            foreach ($this->_writerWorksheets[$i]->_phpSheet->getCellCollection() as $cellID) {
-                $cell = $this->_writerWorksheets[$i]->_phpSheet->getCell($cellID);
+            foreach ($this->writerWorksheets[$i]->phpSheet->getCellCollection() as $cellID) {
+                $cell = $this->writerWorksheets[$i]->phpSheet->getCell($cellID);
                 $cVal = $cell->getValue();
                 if ($cVal instanceof PHPExcel_RichText) {
                     $elements = $cVal->getRichTextElements();
                     foreach ($elements as $element) {
                         if ($element instanceof PHPExcel_RichText_Run) {
                             $font = $element->getFont();
-                            $this->_writerWorksheets[$i]->_fntHashIndex[$font->getHashCode()] = $this->_writerWorkbook->_addFont($font);
+                            $this->writerWorksheets[$i]->fontHashIndex[$font->getHashCode()] = $this->writerWorkbook->addFont($font);
                         }
                     }
                 }
@@ -178,30 +172,30 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
         // because the byte sizes of these are needed in the global workbook stream
         $worksheetSizes = array();
         for ($i = 0; $i < $countSheets; ++$i) {
-            $this->_writerWorksheets[$i]->close();
-            $worksheetSizes[] = $this->_writerWorksheets[$i]->_datasize;
+            $this->writerWorksheets[$i]->close();
+            $worksheetSizes[] = $this->writerWorksheets[$i]->_datasize;
         }
 
         // add binary data for global workbook stream
-        $OLE->append($this->_writerWorkbook->writeWorkbook($worksheetSizes));
+        $OLE->append($this->writerWorkbook->writeWorkbook($worksheetSizes));
 
         // add binary data for sheet streams
         for ($i = 0; $i < $countSheets; ++$i) {
-            $OLE->append($this->_writerWorksheets[$i]->getData());
+            $OLE->append($this->writerWorksheets[$i]->getData());
         }
 
-        $this->_documentSummaryInformation = $this->_writeDocumentSummaryInformation();
+        $this->documentSummaryInformation = $this->writeDocumentSummaryInformation();
         // initialize OLE Document Summary Information
-        if (isset($this->_documentSummaryInformation) && !empty($this->_documentSummaryInformation)) {
+        if (isset($this->documentSummaryInformation) && !empty($this->documentSummaryInformation)) {
             $OLE_DocumentSummaryInformation = new PHPExcel_Shared_OLE_PPS_File(PHPExcel_Shared_OLE::Asc2Ucs(chr(5) . 'DocumentSummaryInformation'));
-            $OLE_DocumentSummaryInformation->append($this->_documentSummaryInformation);
+            $OLE_DocumentSummaryInformation->append($this->documentSummaryInformation);
         }
 
-        $this->_summaryInformation = $this->_writeSummaryInformation();
+        $this->summaryInformation = $this->writeSummaryInformation();
         // initialize OLE Summary Information
-        if (isset($this->_summaryInformation) && !empty($this->_summaryInformation)) {
+        if (isset($this->summaryInformation) && !empty($this->summaryInformation)) {
             $OLE_SummaryInformation = new PHPExcel_Shared_OLE_PPS_File(PHPExcel_Shared_OLE::Asc2Ucs(chr(5) . 'SummaryInformation'));
-            $OLE_SummaryInformation->append($this->_summaryInformation);
+            $OLE_SummaryInformation->append($this->summaryInformation);
         }
 
         // define OLE Parts
@@ -220,18 +214,19 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
         $res = $root->save($pFilename);
 
         PHPExcel_Calculation_Functions::setReturnDateType($saveDateReturnType);
-        PHPExcel_Calculation::getInstance($this->_phpExcel)->getDebugLog()->setWriteDebugLog($saveDebugLog);
+        PHPExcel_Calculation::getInstance($this->phpExcel)->getDebugLog()->setWriteDebugLog($saveDebugLog);
     }
 
     /**
      * Set temporary storage directory
      *
      * @deprecated
-     * @param	string	$pValue		Temporary storage directory
-     * @throws	PHPExcel_Writer_Exception	when directory does not exist
+     * @param    string    $pValue        Temporary storage directory
+     * @throws    PHPExcel_Writer_Exception    when directory does not exist
      * @return PHPExcel_Writer_Excel5
      */
-    public function setTempDir($pValue = '') {
+    public function setTempDir($pValue = '')
+    {
         return $this;
     }
 
@@ -239,13 +234,14 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
      * Build the Worksheet Escher objects
      *
      */
-    private function _buildWorksheetEschers() {
+    private function buildWorksheetEschers()
+    {
         // 1-based index to BstoreContainer
         $blipIndex = 0;
         $lastReducedSpId = 0;
         $lastSpId = 0;
 
-        foreach ($this->_phpExcel->getAllsheets() as $sheet) {
+        foreach ($this->phpExcel->getAllsheets() as $sheet) {
             // sheet index
             $sheetIndex = $sheet->getParent()->getIndex($sheet);
 
@@ -298,7 +294,8 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
 
                 // set the shape index (we combine 1-based sheet index and $countShapes to create unique shape index)
                 $reducedSpId = $countShapes[$sheetIndex];
-                $spId = $reducedSpId | ($sheet->getParent()->getIndex($sheet) + 1) << 10;
+                $spId = $reducedSpId
+                    | ($sheet->getParent()->getIndex($sheet) + 1) << 10;
                 $spContainer->setSpId($spId);
 
                 // keep track of last reducedSpId
@@ -340,9 +337,9 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
                     ++$countShapes[$sheetIndex];
 
                     // create an Drawing Object for the dropdown
-                    $oDrawing = new PHPExcel_Worksheet_BaseDrawing();
+                    $oDrawing  = new PHPExcel_Worksheet_BaseDrawing();
                     // get the coordinates of drawing
-                    $cDrawing = PHPExcel_Cell::stringFromColumnIndex($iInc - 1) . $rangeBounds[0][1];
+                    $cDrawing   = PHPExcel_Cell::stringFromColumnIndex($iInc - 1) . $rangeBounds[0][1];
                     $oDrawing->setCoordinates($cDrawing);
                     $oDrawing->setWorksheet($sheet);
 
@@ -355,7 +352,8 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
 
                     // set the shape index (we combine 1-based sheet index and $countShapes to create unique shape index)
                     $reducedSpId = $countShapes[$sheetIndex];
-                    $spId = $reducedSpId | ($sheet->getParent()->getIndex($sheet) + 1) << 10;
+                    $spId = $reducedSpId
+                        | ($sheet->getParent()->getIndex($sheet) + 1) << 10;
                     $spContainer->setSpId($spId);
 
                     // keep track of last reducedSpId
@@ -369,6 +367,7 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
                     $spContainer->setOPT(0x01BF, 0x00010000); // Fill Style -> fNoFillHitTest
                     $spContainer->setOPT(0x01FF, 0x00080000); // Line Style -> fNoLineDrawDash
                     $spContainer->setOPT(0x03BF, 0x000A0000); // Group Shape -> fPrint
+
                     // set coordinates and offsets, client anchor
                     $endCoordinates = PHPExcel_Cell::stringFromColumnIndex(PHPExcel_Cell::stringFromColumnIndex($iInc - 1));
                     $endCoordinates .= $rangeBounds[0][1] + 1;
@@ -386,25 +385,26 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
             }
 
             // identifier clusters, used for workbook Escher object
-            $this->_IDCLs[$dgId] = $lastReducedSpId;
+            $this->IDCLs[$dgId] = $lastReducedSpId;
 
             // set last shape index
             $dgContainer->setLastSpId($lastSpId);
 
             // set the Escher object
-            $this->_writerWorksheets[$sheetIndex]->setEscher($escher);
+            $this->writerWorksheets[$sheetIndex]->setEscher($escher);
         }
     }
 
     /**
      * Build the Escher object corresponding to the MSODRAWINGGROUP record
      */
-    private function _buildWorkbookEscher() {
+    private function buildWorkbookEscher()
+    {
         $escher = null;
 
         // any drawings in this workbook?
         $found = false;
-        foreach ($this->_phpExcel->getAllSheets() as $sheet) {
+        foreach ($this->phpExcel->getAllSheets() as $sheet) {
             if (count($sheet->getDrawingCollection()) > 0) {
                 $found = true;
                 break;
@@ -424,14 +424,14 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
         $escher->setDggContainer($dggContainer);
 
         // set IDCLs (identifier clusters)
-        $dggContainer->setIDCLs($this->_IDCLs);
+        $dggContainer->setIDCLs($this->IDCLs);
 
         // this loop is for determining maximum shape identifier of all drawing
         $spIdMax = 0;
         $totalCountShapes = 0;
         $countDrawings = 0;
 
-        foreach ($this->_phpExcel->getAllsheets() as $sheet) {
+        foreach ($this->phpExcel->getAllsheets() as $sheet) {
             $sheetCountShapes = 0; // count number of shapes (minus group shape), in sheet
 
             if (count($sheet->getDrawingCollection()) > 0) {
@@ -441,7 +441,7 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
                     ++$sheetCountShapes;
                     ++$totalCountShapes;
 
-                    $spId = $sheetCountShapes | ($this->_phpExcel->getIndex($sheet) + 1) << 10;
+                    $spId = $sheetCountShapes | ($this->phpExcel->getIndex($sheet) + 1) << 10;
                     $spIdMax = max($spId, $spIdMax);
                 }
             }
@@ -450,21 +450,20 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
         $dggContainer->setSpIdMax($spIdMax + 1);
         $dggContainer->setCDgSaved($countDrawings);
         $dggContainer->setCSpSaved($totalCountShapes + $countDrawings); // total number of shapes incl. one group shapes per drawing
+
         // bstoreContainer
         $bstoreContainer = new PHPExcel_Shared_Escher_DggContainer_BstoreContainer();
         $dggContainer->setBstoreContainer($bstoreContainer);
 
         // the BSE's (all the images)
-        foreach ($this->_phpExcel->getAllsheets() as $sheet) {
+        foreach ($this->phpExcel->getAllsheets() as $sheet) {
             foreach ($sheet->getDrawingCollection() as $drawing) {
                 if ($drawing instanceof PHPExcel_Worksheet_Drawing) {
-
                     $filename = $drawing->getPath();
 
                     list($imagesx, $imagesy, $imageFormat) = getimagesize($filename);
 
                     switch ($imageFormat) {
-
                         case 1: // GIF, not supported by BIFF8, we convert to PNG
                             $blipType = PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE::BLIPTYPE_PNG;
                             ob_start();
@@ -472,17 +471,14 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
                             $blipData = ob_get_contents();
                             ob_end_clean();
                             break;
-
                         case 2: // JPEG
                             $blipType = PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE::BLIPTYPE_JPEG;
                             $blipData = file_get_contents($filename);
                             break;
-
                         case 3: // PNG
                             $blipType = PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE::BLIPTYPE_PNG;
                             $blipData = file_get_contents($filename);
                             break;
-
                         case 6: // Windows DIB (BMP), we convert to PNG
                             $blipType = PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE::BLIPTYPE_PNG;
                             ob_start();
@@ -490,8 +486,8 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
                             $blipData = ob_get_contents();
                             ob_end_clean();
                             break;
-
-                        default: continue 2;
+                        default:
+                            continue 2;
                     }
 
                     $blip = new PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE_Blip();
@@ -502,15 +498,12 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
                     $BSE->setBlip($blip);
 
                     $bstoreContainer->addBSE($BSE);
-                } else if ($drawing instanceof PHPExcel_Worksheet_MemoryDrawing) {
-
+                } elseif ($drawing instanceof PHPExcel_Worksheet_MemoryDrawing) {
                     switch ($drawing->getRenderingFunction()) {
-
                         case PHPExcel_Worksheet_MemoryDrawing::RENDERING_JPEG:
                             $blipType = PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE::BLIPTYPE_JPEG;
                             $renderingFunction = 'imagejpeg';
                             break;
-
                         case PHPExcel_Worksheet_MemoryDrawing::RENDERING_GIF:
                         case PHPExcel_Worksheet_MemoryDrawing::RENDERING_PNG:
                         case PHPExcel_Worksheet_MemoryDrawing::RENDERING_DEFAULT:
@@ -537,15 +530,15 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
         }
 
         // Set the Escher object
-        $this->_writerWorkbook->setEscher($escher);
+        $this->writerWorkbook->setEscher($escher);
     }
 
     /**
      * Build the OLE Part for DocumentSummary Information
      * @return string
      */
-    private function _writeDocumentSummaryInformation() {
-
+    private function writeDocumentSummaryInformation()
+    {
         // offset: 0; size: 2; must be 0xFE 0xFF (UTF-16 LE byte order mark)
         $data = pack('v', 0xFFFE);
         // offset: 2; size: 2;
@@ -571,50 +564,50 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
         $dataSection_Content = '';
 
         // GKPIDDSI_CODEPAGE: CodePage
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x01),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x02), // 2 byte signed integer
-            'data' => array('data' => 1252));
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x01),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x02), // 2 byte signed integer
+                               'data'    => array('data' => 1252));
         $dataSection_NumProps++;
 
         // GKPIDDSI_CATEGORY : Category
-        if ($this->_phpExcel->getProperties()->getCategory()) {
-            $dataProp = $this->_phpExcel->getProperties()->getCategory();
-            $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x02),
-                'offset' => array('pack' => 'V'),
-                'type' => array('pack' => 'V', 'data' => 0x1E),
-                'data' => array('data' => $dataProp, 'length' => strlen($dataProp)));
+        if ($this->phpExcel->getProperties()->getCategory()) {
+            $dataProp = $this->phpExcel->getProperties()->getCategory();
+            $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x02),
+                                   'offset' => array('pack' => 'V'),
+                                   'type'     => array('pack' => 'V', 'data' => 0x1E),
+                                   'data'    => array('data' => $dataProp, 'length' => strlen($dataProp)));
             $dataSection_NumProps++;
         }
         // GKPIDDSI_VERSION :Version of the application that wrote the property storage
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x17),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x03),
-            'data' => array('pack' => 'V', 'data' => 0x000C0000));
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x17),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x03),
+                               'data'    => array('pack' => 'V', 'data' => 0x000C0000));
         $dataSection_NumProps++;
         // GKPIDDSI_SCALE : FALSE
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x0B),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x0B),
-            'data' => array('data' => false));
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x0B),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x0B),
+                               'data'    => array('data' => false));
         $dataSection_NumProps++;
         // GKPIDDSI_LINKSDIRTY : True if any of the values for the linked properties have changed outside of the application
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x10),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x0B),
-            'data' => array('data' => false));
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x10),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x0B),
+                               'data'    => array('data' => false));
         $dataSection_NumProps++;
         // GKPIDDSI_SHAREDOC : FALSE
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x13),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x0B),
-            'data' => array('data' => false));
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x13),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x0B),
+                               'data'    => array('data' => false));
         $dataSection_NumProps++;
         // GKPIDDSI_HYPERLINKSCHANGED : True if any of the values for the _PID_LINKS (hyperlink text) have changed outside of the application
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x16),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x0B),
-            'data' => array('data' => false));
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x16),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x0B),
+                               'data'    => array('data' => false));
         $dataSection_NumProps++;
 
         // GKPIDDSI_DOCSPARTS
@@ -624,55 +617,55 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
         $dataProp = pack('v', 0x0001);
         $dataProp .= pack('v', 0x0000);
         // array of UnalignedLpstr
-        // cch
-        $dataProp .= pack('v', 0x000A);
-        $dataProp .= pack('v', 0x0000);
-        // value
-        $dataProp .= 'Worksheet' . chr(0);
+          // cch
+          $dataProp .= pack('v', 0x000A);
+          $dataProp .= pack('v', 0x0000);
+          // value
+          $dataProp .= 'Worksheet'.chr(0);
 
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x0D),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x101E),
-            'data' => array('data' => $dataProp, 'length' => strlen($dataProp)));
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x0D),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x101E),
+                               'data'    => array('data' => $dataProp, 'length' => strlen($dataProp)));
         $dataSection_NumProps++;
 
         // GKPIDDSI_HEADINGPAIR
         // VtVecHeadingPairValue
-        // cElements
-        $dataProp = pack('v', 0x0002);
-        $dataProp .= pack('v', 0x0000);
-        // Array of vtHeadingPair
-        // vtUnalignedString - headingString
-        // stringType
-        $dataProp .= pack('v', 0x001E);
-        // padding
-        $dataProp .= pack('v', 0x0000);
-        // UnalignedLpstr
-        // cch
-        $dataProp .= pack('v', 0x0013);
-        $dataProp .= pack('v', 0x0000);
-        // value
-        $dataProp .= 'Feuilles de calcul';
-        // vtUnalignedString - headingParts
-        // wType : 0x0003 = 32 bit signed integer
-        $dataProp .= pack('v', 0x0300);
-        // padding
-        $dataProp .= pack('v', 0x0000);
-        // value
-        $dataProp .= pack('v', 0x0100);
-        $dataProp .= pack('v', 0x0000);
-        $dataProp .= pack('v', 0x0000);
-        $dataProp .= pack('v', 0x0000);
+          // cElements
+          $dataProp = pack('v', 0x0002);
+          $dataProp .= pack('v', 0x0000);
+          // Array of vtHeadingPair
+            // vtUnalignedString - headingString
+              // stringType
+              $dataProp .= pack('v', 0x001E);
+              // padding
+              $dataProp .= pack('v', 0x0000);
+              // UnalignedLpstr
+                // cch
+                $dataProp .= pack('v', 0x0013);
+                $dataProp .= pack('v', 0x0000);
+                // value
+                $dataProp .= 'Feuilles de calcul';
+            // vtUnalignedString - headingParts
+              // wType : 0x0003 = 32 bit signed integer
+              $dataProp .= pack('v', 0x0300);
+              // padding
+              $dataProp .= pack('v', 0x0000);
+              // value
+              $dataProp .= pack('v', 0x0100);
+              $dataProp .= pack('v', 0x0000);
+              $dataProp .= pack('v', 0x0000);
+              $dataProp .= pack('v', 0x0000);
 
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x0C),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x100C),
-            'data' => array('data' => $dataProp, 'length' => strlen($dataProp)));
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x0C),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x100C),
+                               'data'    => array('data' => $dataProp, 'length' => strlen($dataProp)));
         $dataSection_NumProps++;
 
-        // 		4 	Section Length
-        //		4 	Property count
-        //		8 * $dataSection_NumProps (8 =  ID (4) + OffSet(4))
+        //         4     Section Length
+        //        4     Property count
+        //        8 * $dataSection_NumProps (8 =  ID (4) + OffSet(4))
         $dataSection_Content_Offset = 8 + $dataSection_NumProps * 8;
         foreach ($dataSection as $dataProp) {
             // Summary
@@ -702,7 +695,7 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
                 $dataProp['data']['data'] .= chr(0);
                 $dataProp['data']['length'] += 1;
                 // Complete the string with null string for being a %4
-                $dataProp['data']['length'] = $dataProp['data']['length'] + ((4 - $dataProp['data']['length'] % 4) == 4 ? 0 : (4 - $dataProp['data']['length'] % 4));
+                $dataProp['data']['length'] = $dataProp['data']['length'] + ((4 - $dataProp['data']['length'] % 4)==4 ? 0 : (4 - $dataProp['data']['length'] % 4));
                 $dataProp['data']['data'] = str_pad($dataProp['data']['data'], $dataProp['data']['length'], chr(0), STR_PAD_RIGHT);
 
                 $dataSection_Content .= pack('V', $dataProp['data']['length']);
@@ -721,9 +714,10 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
             }
         }
         // Now $dataSection_Content_Offset contains the size of the content
+
         // section header
         // offset: $secOffset; size: 4; section length
-        // 		+ x  Size of the content (summary + content)
+        //         + x  Size of the content (summary + content)
         $data .= pack('V', $dataSection_Content_Offset);
         // offset: $secOffset+4; size: 4; property count
         $data .= pack('V', $dataSection_NumProps);
@@ -739,7 +733,8 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
      * Build the OLE Part for Summary Information
      * @return string
      */
-    private function _writeSummaryInformation() {
+    private function writeSummaryInformation()
+    {
         // offset: 0; size: 2; must be 0xFE 0xFF (UTF-16 LE byte order mark)
         $data = pack('v', 0xFFFE);
         // offset: 2; size: 2;
@@ -765,95 +760,95 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
         $dataSection_Content = '';
 
         // CodePage : CP-1252
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x01),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x02), // 2 byte signed integer
-            'data' => array('data' => 1252));
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x01),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x02), // 2 byte signed integer
+                               'data'    => array('data' => 1252));
         $dataSection_NumProps++;
 
-        //	Title
-        if ($this->_phpExcel->getProperties()->getTitle()) {
-            $dataProp = $this->_phpExcel->getProperties()->getTitle();
-            $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x02),
-                'offset' => array('pack' => 'V'),
-                'type' => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
-                'data' => array('data' => $dataProp, 'length' => strlen($dataProp)));
+        //    Title
+        if ($this->phpExcel->getProperties()->getTitle()) {
+            $dataProp = $this->phpExcel->getProperties()->getTitle();
+            $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x02),
+                                   'offset' => array('pack' => 'V'),
+                                   'type'     => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
+                                   'data'    => array('data' => $dataProp, 'length' => strlen($dataProp)));
             $dataSection_NumProps++;
         }
-        //	Subject
-        if ($this->_phpExcel->getProperties()->getSubject()) {
-            $dataProp = $this->_phpExcel->getProperties()->getSubject();
-            $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x03),
-                'offset' => array('pack' => 'V'),
-                'type' => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
-                'data' => array('data' => $dataProp, 'length' => strlen($dataProp)));
+        //    Subject
+        if ($this->phpExcel->getProperties()->getSubject()) {
+            $dataProp = $this->phpExcel->getProperties()->getSubject();
+            $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x03),
+                                   'offset' => array('pack' => 'V'),
+                                   'type'     => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
+                                   'data'    => array('data' => $dataProp, 'length' => strlen($dataProp)));
             $dataSection_NumProps++;
         }
-        //	Author (Creator)
-        if ($this->_phpExcel->getProperties()->getCreator()) {
-            $dataProp = $this->_phpExcel->getProperties()->getCreator();
-            $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x04),
-                'offset' => array('pack' => 'V'),
-                'type' => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
-                'data' => array('data' => $dataProp, 'length' => strlen($dataProp)));
+        //    Author (Creator)
+        if ($this->phpExcel->getProperties()->getCreator()) {
+            $dataProp = $this->phpExcel->getProperties()->getCreator();
+            $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x04),
+                                   'offset' => array('pack' => 'V'),
+                                   'type'     => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
+                                   'data'    => array('data' => $dataProp, 'length' => strlen($dataProp)));
             $dataSection_NumProps++;
         }
-        //	Keywords
-        if ($this->_phpExcel->getProperties()->getKeywords()) {
-            $dataProp = $this->_phpExcel->getProperties()->getKeywords();
-            $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x05),
-                'offset' => array('pack' => 'V'),
-                'type' => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
-                'data' => array('data' => $dataProp, 'length' => strlen($dataProp)));
+        //    Keywords
+        if ($this->phpExcel->getProperties()->getKeywords()) {
+            $dataProp = $this->phpExcel->getProperties()->getKeywords();
+            $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x05),
+                                   'offset' => array('pack' => 'V'),
+                                   'type'     => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
+                                   'data'    => array('data' => $dataProp, 'length' => strlen($dataProp)));
             $dataSection_NumProps++;
         }
-        //	Comments (Description)
-        if ($this->_phpExcel->getProperties()->getDescription()) {
-            $dataProp = $this->_phpExcel->getProperties()->getDescription();
-            $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x06),
-                'offset' => array('pack' => 'V'),
-                'type' => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
-                'data' => array('data' => $dataProp, 'length' => strlen($dataProp)));
+        //    Comments (Description)
+        if ($this->phpExcel->getProperties()->getDescription()) {
+            $dataProp = $this->phpExcel->getProperties()->getDescription();
+            $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x06),
+                                   'offset' => array('pack' => 'V'),
+                                   'type'     => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
+                                   'data'    => array('data' => $dataProp, 'length' => strlen($dataProp)));
             $dataSection_NumProps++;
         }
-        //	Last Saved By (LastModifiedBy)
-        if ($this->_phpExcel->getProperties()->getLastModifiedBy()) {
-            $dataProp = $this->_phpExcel->getProperties()->getLastModifiedBy();
-            $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x08),
-                'offset' => array('pack' => 'V'),
-                'type' => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
-                'data' => array('data' => $dataProp, 'length' => strlen($dataProp)));
+        //    Last Saved By (LastModifiedBy)
+        if ($this->phpExcel->getProperties()->getLastModifiedBy()) {
+            $dataProp = $this->phpExcel->getProperties()->getLastModifiedBy();
+            $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x08),
+                                   'offset' => array('pack' => 'V'),
+                                   'type'     => array('pack' => 'V', 'data' => 0x1E), // null-terminated string prepended by dword string length
+                                   'data'    => array('data' => $dataProp, 'length' => strlen($dataProp)));
             $dataSection_NumProps++;
         }
-        //	Created Date/Time
-        if ($this->_phpExcel->getProperties()->getCreated()) {
-            $dataProp = $this->_phpExcel->getProperties()->getCreated();
-            $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x0C),
-                'offset' => array('pack' => 'V'),
-                'type' => array('pack' => 'V', 'data' => 0x40), // Filetime (64-bit value representing the number of 100-nanosecond intervals since January 1, 1601)
-                'data' => array('data' => PHPExcel_Shared_OLE::LocalDate2OLE($dataProp)));
+        //    Created Date/Time
+        if ($this->phpExcel->getProperties()->getCreated()) {
+            $dataProp = $this->phpExcel->getProperties()->getCreated();
+            $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x0C),
+                                   'offset' => array('pack' => 'V'),
+                                   'type'     => array('pack' => 'V', 'data' => 0x40), // Filetime (64-bit value representing the number of 100-nanosecond intervals since January 1, 1601)
+                                   'data'    => array('data' => PHPExcel_Shared_OLE::LocalDate2OLE($dataProp)));
             $dataSection_NumProps++;
         }
-        //	Modified Date/Time
-        if ($this->_phpExcel->getProperties()->getModified()) {
-            $dataProp = $this->_phpExcel->getProperties()->getModified();
-            $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x0D),
-                'offset' => array('pack' => 'V'),
-                'type' => array('pack' => 'V', 'data' => 0x40), // Filetime (64-bit value representing the number of 100-nanosecond intervals since January 1, 1601)
-                'data' => array('data' => PHPExcel_Shared_OLE::LocalDate2OLE($dataProp)));
+        //    Modified Date/Time
+        if ($this->phpExcel->getProperties()->getModified()) {
+            $dataProp = $this->phpExcel->getProperties()->getModified();
+            $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x0D),
+                                   'offset' => array('pack' => 'V'),
+                                   'type'     => array('pack' => 'V', 'data' => 0x40), // Filetime (64-bit value representing the number of 100-nanosecond intervals since January 1, 1601)
+                                   'data'    => array('data' => PHPExcel_Shared_OLE::LocalDate2OLE($dataProp)));
             $dataSection_NumProps++;
         }
-        //	Security
-        $dataSection[] = array('summary' => array('pack' => 'V', 'data' => 0x13),
-            'offset' => array('pack' => 'V'),
-            'type' => array('pack' => 'V', 'data' => 0x03), // 4 byte signed integer
-            'data' => array('data' => 0x00));
+        //    Security
+        $dataSection[] = array('summary'=> array('pack' => 'V', 'data' => 0x13),
+                               'offset' => array('pack' => 'V'),
+                               'type'     => array('pack' => 'V', 'data' => 0x03), // 4 byte signed integer
+                               'data'    => array('data' => 0x00));
         $dataSection_NumProps++;
 
 
-        // 		4 	Section Length
-        //		4 	Property count
-        //		8 * $dataSection_NumProps (8 =  ID (4) + OffSet(4))
+        //         4     Section Length
+        //        4     Property count
+        //        8 * $dataSection_NumProps (8 =  ID (4) + OffSet(4))
         $dataSection_Content_Offset = 8 + $dataSection_NumProps * 8;
         foreach ($dataSection as $dataProp) {
             // Summary
@@ -876,7 +871,7 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
                 $dataProp['data']['data'] .= chr(0);
                 $dataProp['data']['length'] += 1;
                 // Complete the string with null string for being a %4
-                $dataProp['data']['length'] = $dataProp['data']['length'] + ((4 - $dataProp['data']['length'] % 4) == 4 ? 0 : (4 - $dataProp['data']['length'] % 4));
+                $dataProp['data']['length'] = $dataProp['data']['length'] + ((4 - $dataProp['data']['length'] % 4)==4 ? 0 : (4 - $dataProp['data']['length'] % 4));
                 $dataProp['data']['data'] = str_pad($dataProp['data']['data'], $dataProp['data']['length'], chr(0), STR_PAD_RIGHT);
 
                 $dataSection_Content .= pack('V', $dataProp['data']['length']);
@@ -892,9 +887,10 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
             }
         }
         // Now $dataSection_Content_Offset contains the size of the content
+
         // section header
         // offset: $secOffset; size: 4; section length
-        // 		+ x  Size of the content (summary + content)
+        //         + x  Size of the content (summary + content)
         $data .= pack('V', $dataSection_Content_Offset);
         // offset: $secOffset+4; size: 4; property count
         $data .= pack('V', $dataSection_NumProps);
@@ -905,5 +901,4 @@ class PHPExcel_Writer_Excel5 extends PHPExcel_Writer_Abstract implements PHPExce
 
         return $data;
     }
-
 }

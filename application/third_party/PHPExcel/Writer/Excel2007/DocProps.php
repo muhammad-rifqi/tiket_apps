@@ -1,9 +1,9 @@
 <?php
 
 /**
- * PHPExcel
+ * PHPExcel_Writer_Excel2007_DocProps
  *
- * Copyright (c) 2006 - 2014 PHPExcel
+ * Copyright (c) 2006 - 2015 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,28 +21,21 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel_Writer_Excel2007
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version    1.8.0, 2014-03-02
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ * @version    ##VERSION##, ##DATE##
  */
-
-/**
- * PHPExcel_Writer_Excel2007_DocProps
- *
- * @category   PHPExcel
- * @package    PHPExcel_Writer_Excel2007
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- */
-class PHPExcel_Writer_Excel2007_DocProps extends PHPExcel_Writer_Excel2007_WriterPart {
-
+class PHPExcel_Writer_Excel2007_DocProps extends PHPExcel_Writer_Excel2007_WriterPart
+{
     /**
      * Write docProps/app.xml to XML format
      *
-     * @param 	PHPExcel	$pPHPExcel
-     * @return 	string 		XML Output
-     * @throws 	PHPExcel_Writer_Exception
+     * @param     PHPExcel    $pPHPExcel
+     * @return     string         XML Output
+     * @throws     PHPExcel_Writer_Exception
      */
-    public function writeDocPropsApp(PHPExcel $pPHPExcel = null) {
+    public function writeDocPropsApp(PHPExcel $pPHPExcel = null)
+    {
         // Create XML writer
         $objWriter = null;
         if ($this->getParentWriter()->getUseDiskCaching()) {
@@ -134,11 +127,12 @@ class PHPExcel_Writer_Excel2007_DocProps extends PHPExcel_Writer_Excel2007_Write
     /**
      * Write docProps/core.xml to XML format
      *
-     * @param 	PHPExcel	$pPHPExcel
-     * @return 	string 		XML Output
-     * @throws 	PHPExcel_Writer_Exception
+     * @param     PHPExcel    $pPHPExcel
+     * @return     string         XML Output
+     * @throws     PHPExcel_Writer_Exception
      */
-    public function writeDocPropsCore(PHPExcel $pPHPExcel = null) {
+    public function writeDocPropsCore(PHPExcel $pPHPExcel = null)
+    {
         // Create XML writer
         $objWriter = null;
         if ($this->getParentWriter()->getUseDiskCaching()) {
@@ -200,11 +194,12 @@ class PHPExcel_Writer_Excel2007_DocProps extends PHPExcel_Writer_Excel2007_Write
     /**
      * Write docProps/custom.xml to XML format
      *
-     * @param 	PHPExcel	$pPHPExcel
-     * @return 	string 		XML Output
-     * @throws 	PHPExcel_Writer_Exception
+     * @param     PHPExcel    $pPHPExcel
+     * @return     string         XML Output
+     * @throws     PHPExcel_Writer_Exception
      */
-    public function writeDocPropsCustom(PHPExcel $pPHPExcel = null) {
+    public function writeDocPropsCustom(PHPExcel $pPHPExcel = null)
+    {
         $customPropertyList = $pPHPExcel->getProperties()->getCustomProperties();
         if (empty($customPropertyList)) {
             return;
@@ -233,25 +228,25 @@ class PHPExcel_Writer_Excel2007_DocProps extends PHPExcel_Writer_Excel2007_Write
 
             $objWriter->startElement('property');
             $objWriter->writeAttribute('fmtid', '{D5CDD505-2E9C-101B-9397-08002B2CF9AE}');
-            $objWriter->writeAttribute('pid', $key + 2);
+            $objWriter->writeAttribute('pid', $key+2);
             $objWriter->writeAttribute('name', $customProperty);
 
             switch ($propertyType) {
-                case 'i' :
+                case 'i':
                     $objWriter->writeElement('vt:i4', $propertyValue);
                     break;
-                case 'f' :
+                case 'f':
                     $objWriter->writeElement('vt:r8', $propertyValue);
                     break;
-                case 'b' :
+                case 'b':
                     $objWriter->writeElement('vt:bool', ($propertyValue) ? 'true' : 'false');
                     break;
-                case 'd' :
+                case 'd':
                     $objWriter->startElement('vt:filetime');
                     $objWriter->writeRawData(date(DATE_W3C, $propertyValue));
                     $objWriter->endElement();
                     break;
-                default :
+                default:
                     $objWriter->writeElement('vt:lpwstr', $propertyValue);
                     break;
             }
@@ -262,8 +257,6 @@ class PHPExcel_Writer_Excel2007_DocProps extends PHPExcel_Writer_Excel2007_Write
 
         $objWriter->endElement();
 
-        // Return
         return $objWriter->getData();
     }
-
 }

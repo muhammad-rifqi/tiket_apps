@@ -1,9 +1,9 @@
 <?php
 
 /**
- * PHPExcel
+ * PHPExcel_CachedObjectStorage_Memory
  *
- * Copyright (c) 2006 - 2014 PHPExcel
+ * Copyright (c) 2006 - 2015 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,110 +21,98 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel_CachedObjectStorage
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version    1.8.0, 2014-03-02
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ * @version    ##VERSION##, ##DATE##
  */
-
-/**
- * PHPExcel_CachedObjectStorage_Memory
- *
- * @category   PHPExcel
- * @package    PHPExcel_CachedObjectStorage
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- */
-class PHPExcel_CachedObjectStorage_Memory extends PHPExcel_CachedObjectStorage_CacheBase implements PHPExcel_CachedObjectStorage_ICache {
-
+class PHPExcel_CachedObjectStorage_Memory extends PHPExcel_CachedObjectStorage_CacheBase implements PHPExcel_CachedObjectStorage_ICache
+{
     /**
      * Dummy method callable from CacheBase, but unused by Memory cache
      *
-     * @return	void
+     * @return    void
      */
-    protected function _storeData() {
-        
+    protected function storeData()
+    {
     }
-
-//	function _storeData()
 
     /**
      * Add or Update a cell in cache identified by coordinate address
      *
-     * @param	string			$pCoord		Coordinate address of the cell to update
-     * @param	PHPExcel_Cell	$cell		Cell to update
-     * @return	PHPExcel_Cell
-     * @throws	PHPExcel_Exception
+     * @param    string            $pCoord        Coordinate address of the cell to update
+     * @param    PHPExcel_Cell    $cell        Cell to update
+     * @return    PHPExcel_Cell
+     * @throws    PHPExcel_Exception
      */
-    public function addCacheData($pCoord, PHPExcel_Cell $cell) {
-        $this->_cellCache[$pCoord] = $cell;
+    public function addCacheData($pCoord, PHPExcel_Cell $cell)
+    {
+        $this->cellCache[$pCoord] = $cell;
 
-        //	Set current entry to the new/updated entry
-        $this->_currentObjectID = $pCoord;
+        //    Set current entry to the new/updated entry
+        $this->currentObjectID = $pCoord;
 
         return $cell;
     }
 
-//	function addCacheData()
 
     /**
      * Get cell at a specific coordinate
      *
-     * @param 	string 			$pCoord		Coordinate of the cell
-     * @throws 	PHPExcel_Exception
-     * @return 	PHPExcel_Cell 	Cell that was found, or null if not found
+     * @param     string             $pCoord        Coordinate of the cell
+     * @throws     PHPExcel_Exception
+     * @return     PHPExcel_Cell     Cell that was found, or null if not found
      */
-    public function getCacheData($pCoord) {
-        //	Check if the entry that has been requested actually exists
-        if (!isset($this->_cellCache[$pCoord])) {
-            $this->_currentObjectID = NULL;
-            //	Return null if requested entry doesn't exist in cache
+    public function getCacheData($pCoord)
+    {
+        //    Check if the entry that has been requested actually exists
+        if (!isset($this->cellCache[$pCoord])) {
+            $this->currentObjectID = null;
+            //    Return null if requested entry doesn't exist in cache
             return null;
         }
 
-        //	Set current entry to the requested entry
-        $this->_currentObjectID = $pCoord;
+        //    Set current entry to the requested entry
+        $this->currentObjectID = $pCoord;
 
-        //	Return requested entry
-        return $this->_cellCache[$pCoord];
+        //    Return requested entry
+        return $this->cellCache[$pCoord];
     }
 
-//	function getCacheData()
 
     /**
      * Clone the cell collection
      *
-     * @param	PHPExcel_Worksheet	$parent		The new worksheet
-     * @return	void
+     * @param    PHPExcel_Worksheet    $parent        The new worksheet
      */
-    public function copyCellCollection(PHPExcel_Worksheet $parent) {
+    public function copyCellCollection(PHPExcel_Worksheet $parent)
+    {
         parent::copyCellCollection($parent);
 
         $newCollection = array();
-        foreach ($this->_cellCache as $k => &$cell) {
+        foreach ($this->cellCache as $k => &$cell) {
             $newCollection[$k] = clone $cell;
             $newCollection[$k]->attach($this);
         }
 
-        $this->_cellCache = $newCollection;
+        $this->cellCache = $newCollection;
     }
 
     /**
      * Clear the cell collection and disconnect from our parent
      *
-     * @return	void
      */
-    public function unsetWorksheetCells() {
-        //	Because cells are all stored as intact objects in memory, we need to detach each one from the parent
-        foreach ($this->_cellCache as $k => &$cell) {
+    public function unsetWorksheetCells()
+    {
+        // Because cells are all stored as intact objects in memory, we need to detach each one from the parent
+        foreach ($this->cellCache as $k => &$cell) {
             $cell->detach();
-            $this->_cellCache[$k] = null;
+            $this->cellCache[$k] = null;
         }
         unset($cell);
 
-        $this->_cellCache = array();
+        $this->cellCache = array();
 
-        //	detach ourself from the worksheet, so that it can then delete this object successfully
-        $this->_parent = null;
+        //    detach ourself from the worksheet, so that it can then delete this object successfully
+        $this->parent = null;
     }
-
-//	function unsetWorksheetCells()
 }

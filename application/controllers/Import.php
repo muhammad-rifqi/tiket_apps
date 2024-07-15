@@ -43,26 +43,27 @@ class Import extends CI_Controller {
                     $objReader = PHPExcel_IOFactory::createReader($inputFileType);
                     $objPHPExcel = $objReader->load($inputFileName);
                     $allDataInSheet = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
-                    $flag = true;
-                    $i=0;
-                    foreach ($allDataInSheet as $value) {
-                      if($flag){
-                        $flag =false;
-                        continue;
-                      }
-                      $inserdata[$i]['tiket_number'] = $value['A'];
-                      $inserdata[$i]['submitted_date'] = $value['B'];
-                      $inserdata[$i]['workshop'] = $value['C'];
-                      $inserdata[$i]['service'] = $value['D'];
-                      $inserdata[$i]['part'] = $value['E'];
-                      $i++;
-                    }               
-                    $result = $this->import->importData($inserdata);   
-                    if($result){
-                      echo "Imported successfully";
-                    }else{
-                      echo "ERROR !";
-                    }             
+                    // $flag = true;
+                    // $i=0;
+                    // foreach ($allDataInSheet as $value) {
+                    //   if($flag){
+                    //     $flag =false;
+                    //     continue;
+                    //   }
+                    //   $inserdata[$i]['tiket_number'] = $value['A'];
+                    //   $inserdata[$i]['submitted_date'] = $value['B'];
+                    //   $inserdata[$i]['workshop'] = $value['C'];
+                    //   $inserdata[$i]['service'] = $value['D'];
+                    //   $inserdata[$i]['part'] = $value['E'];
+                    //   $i++;
+                    // }               
+                    // $result = $this->import->importData($inserdata);   
+                    // if($result){
+                    //   echo "Imported successfully";
+                    // }else{
+                    //   echo "ERROR !";
+                    // }             
+                    print_r($allDataInSheet);
       
               } catch (Exception $e) {
                    die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME)

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * PHPExcel
+ * PHPExcel_Cell_DataType
  *
- * Copyright (c) 2006 - 2014 PHPExcel
+ * Copyright (c) 2006 - 2015 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,43 +21,35 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel_Cell
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
  * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
- * @version    1.8.0, 2014-03-02
+ * @version    ##VERSION##, ##DATE##
  */
-
-/**
- * PHPExcel_Cell_DataType
- *
- * @category   PHPExcel
- * @package    PHPExcel_Cell
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- */
-class PHPExcel_Cell_DataType {
+class PHPExcel_Cell_DataType
+{
     /* Data types */
-
-    const TYPE_STRING2 = 'str';
-    const TYPE_STRING = 's';
-    const TYPE_FORMULA = 'f';
-    const TYPE_NUMERIC = 'n';
-    const TYPE_BOOL = 'b';
-    const TYPE_NULL = 'null';
-    const TYPE_INLINE = 'inlineStr';
-    const TYPE_ERROR = 'e';
+    const TYPE_STRING2  = 'str';
+    const TYPE_STRING   = 's';
+    const TYPE_FORMULA  = 'f';
+    const TYPE_NUMERIC  = 'n';
+    const TYPE_BOOL     = 'b';
+    const TYPE_NULL     = 'null';
+    const TYPE_INLINE   = 'inlineStr';
+    const TYPE_ERROR    = 'e';
 
     /**
      * List of error codes
      *
      * @var array
      */
-    private static $_errorCodes = array(
-        '#NULL!' => 0,
+    private static $errorCodes = array(
+        '#NULL!'  => 0,
         '#DIV/0!' => 1,
         '#VALUE!' => 2,
-        '#REF!' => 3,
-        '#NAME?' => 4,
-        '#NUM!' => 5,
-        '#N/A' => 6
+        '#REF!'   => 3,
+        '#NAME?'  => 4,
+        '#NUM!'   => 5,
+        '#N/A'    => 6
     );
 
     /**
@@ -65,8 +57,9 @@ class PHPExcel_Cell_DataType {
      *
      * @return array
      */
-    public static function getErrorCodes() {
-        return self::$_errorCodes;
+    public static function getErrorCodes()
+    {
+        return self::$errorCodes;
     }
 
     /**
@@ -76,7 +69,8 @@ class PHPExcel_Cell_DataType {
      * @param       mixed  $pValue
      * @return      string
      */
-    public static function dataTypeForValue($pValue = null) {
+    public static function dataTypeForValue($pValue = null)
+    {
         return PHPExcel_Cell_DefaultValueBinder::dataTypeForValue($pValue);
     }
 
@@ -86,7 +80,8 @@ class PHPExcel_Cell_DataType {
      * @param  mixed  Value to sanitize to an Excel string
      * @return mixed  Sanitized value
      */
-    public static function checkString($pValue = null) {
+    public static function checkString($pValue = null)
+    {
         if ($pValue instanceof PHPExcel_RichText) {
             // TODO: Sanitize Rich-Text string (max. character count is 32,767)
             return $pValue;
@@ -107,14 +102,14 @@ class PHPExcel_Cell_DataType {
      * @param  mixed   Value to sanitize to an Excel error code
      * @return string  Sanitized value
      */
-    public static function checkErrorCode($pValue = null) {
+    public static function checkErrorCode($pValue = null)
+    {
         $pValue = (string) $pValue;
 
-        if (!array_key_exists($pValue, self::$_errorCodes)) {
+        if (!array_key_exists($pValue, self::$errorCodes)) {
             $pValue = '#NULL!';
         }
 
         return $pValue;
     }
-
 }

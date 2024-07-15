@@ -1,9 +1,9 @@
 <?php
 
 /**
- * PHPExcel
+ * PHPExcel_Shared_Escher_DggContainer_BstoreContainer
  *
- * Copyright (c) 2006 - 2014 PHPExcel
+ * Copyright (c) 2006 - 2015 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,34 +21,27 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel_Shared_Escher
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version    1.8.0, 2014-03-02
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ * @version    ##VERSION##, ##DATE##
  */
-
-/**
- * PHPExcel_Shared_Escher_DggContainer_BstoreContainer
- *
- * @category   PHPExcel
- * @package    PHPExcel_Shared_Escher
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- */
-class PHPExcel_Shared_Escher_DggContainer_BstoreContainer {
-
+class PHPExcel_Shared_Escher_DggContainer_BstoreContainer
+{
     /**
      * BLIP Store Entries. Each of them holds one BLIP (Big Large Image or Picture)
      *
      * @var array
      */
-    private $_BSECollection = array();
+    private $BSECollection = array();
 
     /**
      * Add a BLIP Store Entry
      *
      * @param PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE $BSE
      */
-    public function addBSE($BSE) {
-        $this->_BSECollection[] = $BSE;
+    public function addBSE($BSE)
+    {
+        $this->BSECollection[] = $BSE;
         $BSE->setParent($this);
     }
 
@@ -57,8 +50,8 @@ class PHPExcel_Shared_Escher_DggContainer_BstoreContainer {
      *
      * @return PHPExcel_Shared_Escher_DggContainer_BstoreContainer_BSE[]
      */
-    public function getBSECollection() {
-        return $this->_BSECollection;
+    public function getBSECollection()
+    {
+        return $this->BSECollection;
     }
-
 }

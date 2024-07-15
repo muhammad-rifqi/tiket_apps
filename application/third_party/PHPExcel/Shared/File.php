@@ -1,9 +1,9 @@
 <?php
 
 /**
- * PHPExcel
+ * PHPExcel_Shared_File
  *
- * Copyright (c) 2006 - 2014 PHPExcel
+ * Copyright (c) 2006 - 2015 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,63 +21,57 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel_Shared
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version    1.8.0, 2014-03-02
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ * @version    ##VERSION##, ##DATE##
  */
-
-/**
- * PHPExcel_Shared_File
- *
- * @category   PHPExcel
- * @package    PHPExcel_Shared
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- */
-class PHPExcel_Shared_File {
+class PHPExcel_Shared_File
+{
     /*
      * Use Temp or File Upload Temp for temporary files
      *
      * @protected
-     * @var	boolean
+     * @var    boolean
      */
+    protected static $useUploadTempDirectory = false;
 
-    protected static $_useUploadTempDirectory = FALSE;
 
     /**
      * Set the flag indicating whether the File Upload Temp directory should be used for temporary files
      *
-     * @param	 boolean	$useUploadTempDir		Use File Upload Temporary directory (true or false)
+     * @param     boolean    $useUploadTempDir        Use File Upload Temporary directory (true or false)
      */
-    public static function setUseUploadTempDirectory($useUploadTempDir = FALSE) {
-        self::$_useUploadTempDirectory = (boolean) $useUploadTempDir;
+    public static function setUseUploadTempDirectory($useUploadTempDir = false)
+    {
+        self::$useUploadTempDirectory = (boolean) $useUploadTempDir;
     }
 
-//	function setUseUploadTempDirectory()
 
     /**
      * Get the flag indicating whether the File Upload Temp directory should be used for temporary files
      *
-     * @return	 boolean	Use File Upload Temporary directory (true or false)
+     * @return     boolean    Use File Upload Temporary directory (true or false)
      */
-    public static function getUseUploadTempDirectory() {
-        return self::$_useUploadTempDirectory;
+    public static function getUseUploadTempDirectory()
+    {
+        return self::$useUploadTempDirectory;
     }
 
-//	function getUseUploadTempDirectory()
 
     /**
-     * Verify if a file exists
-     *
-     * @param 	string	$pFilename	Filename
-     * @return bool
-     */
-    public static function file_exists($pFilename) {
+      * Verify if a file exists
+      *
+      * @param     string    $pFilename    Filename
+      * @return bool
+      */
+    public static function file_exists($pFilename)
+    {
         // Sick construction, but it seems that
         // file_exists returns strange values when
         // doing the original file_exists on ZIP archives...
         if (strtolower(substr($pFilename, 0, 3)) == 'zip') {
             // Open ZIP file and verify if the file exists
-            $zipFile = substr($pFilename, 6, strpos($pFilename, '#') - 6);
+            $zipFile     = substr($pFilename, 6, strpos($pFilename, '#') - 6);
             $archiveFile = substr($pFilename, strpos($pFilename, '#') + 1);
 
             $zip = new ZipArchive();
@@ -100,7 +94,8 @@ class PHPExcel_Shared_File {
      * @param string $pFilename
      * @return string
      */
-    public static function realpath($pFilename) {
+    public static function realpath($pFilename)
+    {
         // Returnvalue
         $returnValue = '';
 
@@ -110,7 +105,7 @@ class PHPExcel_Shared_File {
         }
 
         // Found something?
-        if ($returnValue == '' || ($returnValue === NULL)) {
+        if ($returnValue == '' || ($returnValue === null)) {
             $pathArray = explode('/', $pFilename);
             while (in_array('..', $pathArray) && $pathArray[0] != '..') {
                 for ($i = 0; $i < count($pathArray); ++$i) {
@@ -133,14 +128,16 @@ class PHPExcel_Shared_File {
      *
      * @return string
      */
-    public static function sys_get_temp_dir() {
-        if (self::$_useUploadTempDirectory) {
+    public static function sys_get_temp_dir()
+    {
+        if (self::$useUploadTempDirectory) {
             //  use upload-directory when defined to allow running on environments having very restricted
             //      open_basedir configs
-            if (ini_get('upload_tmp_dir') !== FALSE) {
+            if (ini_get('upload_tmp_dir') !== false) {
                 if ($temp = ini_get('upload_tmp_dir')) {
-                    if (file_exists($temp))
+                    if (file_exists($temp)) {
                         return realpath($temp);
+                    }
                 }
             }
         }
@@ -176,9 +173,8 @@ class PHPExcel_Shared_File {
         }
 
         // use ordinary built-in PHP function
-        //	There should be no problem with the 5.2.4 Suhosin realpath() bug, because this line should only
-        //		be called if we're running 5.2.1 or earlier
+        //    There should be no problem with the 5.2.4 Suhosin realpath() bug, because this line should only
+        //        be called if we're running 5.2.1 or earlier
         return realpath(sys_get_temp_dir());
     }
-
 }

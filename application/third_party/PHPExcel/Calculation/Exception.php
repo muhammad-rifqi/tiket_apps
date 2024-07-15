@@ -1,9 +1,9 @@
 <?php
 
 /**
- * PHPExcel
+ * PHPExcel_Calculation_Exception
  *
- * Copyright (c) 2006 - 2014 PHPExcel
+ * Copyright (c) 2006 - 2015 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,20 +21,12 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel_Calculation
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- * @license	http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version	1.8.0, 2014-03-02
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ * @version    ##VERSION##, ##DATE##
  */
-
-/**
- * PHPExcel_Calculation_Exception
- *
- * @category   PHPExcel
- * @package    PHPExcel_Calculation
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- */
-class PHPExcel_Calculation_Exception extends PHPExcel_Exception {
-
+class PHPExcel_Calculation_Exception extends PHPExcel_Exception
+{
     /**
      * Error handler callback
      *
@@ -44,11 +36,11 @@ class PHPExcel_Calculation_Exception extends PHPExcel_Exception {
      * @param mixed $line
      * @param mixed $context
      */
-    public static function errorHandlerCallback($code, $string, $file, $line, $context) {
+    public static function errorHandlerCallback($code, $string, $file, $line, $context)
+    {
         $e = new self($string, $code);
         $e->line = $line;
         $e->file = $file;
         throw $e;
     }
-
 }

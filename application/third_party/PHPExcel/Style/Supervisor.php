@@ -1,9 +1,9 @@
 <?php
 
 /**
- * PHPExcel
+ * PHPExcel_Style_Supervisor
  *
- * Copyright (c) 2006 - 2014 PHPExcel
+ * Copyright (c) 2006 - 2015 PHPExcel
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,45 +20,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category   PHPExcel
- * @package	PHPExcel_Style
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- * @license	http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version	1.8.0, 2014-03-02
+ * @package    PHPExcel_Style
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ * @version    ##VERSION##, ##DATE##
  */
-
-/**
- * PHPExcel_Style_Supervisor
- *
- * @category   PHPExcel
- * @package	PHPExcel_Style
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- */
-abstract class PHPExcel_Style_Supervisor {
-
+abstract class PHPExcel_Style_Supervisor
+{
     /**
      * Supervisor?
      *
      * @var boolean
      */
-    protected $_isSupervisor;
+    protected $isSupervisor;
 
     /**
      * Parent. Only used for supervisor
      *
      * @var PHPExcel_Style
      */
-    protected $_parent;
+    protected $parent;
 
     /**
      * Create a new PHPExcel_Style_Alignment
      *
-     * @param	boolean	$isSupervisor	Flag indicating if this is a supervisor or not
-     * 									Leave this value at default unless you understand exactly what
-     * 										its ramifications are
+     * @param    boolean    $isSupervisor    Flag indicating if this is a supervisor or not
+     *                                    Leave this value at default unless you understand exactly what
+     *                                        its ramifications are
      */
-    public function __construct($isSupervisor = FALSE) {
+    public function __construct($isSupervisor = false)
+    {
         // Supervisor?
-        $this->_isSupervisor = $isSupervisor;
+        $this->isSupervisor = $isSupervisor;
     }
 
     /**
@@ -67,8 +60,9 @@ abstract class PHPExcel_Style_Supervisor {
      * @param PHPExcel $parent
      * @return PHPExcel_Style_Supervisor
      */
-    public function bindParent($parent, $parentPropertyName = NULL) {
-        $this->_parent = $parent;
+    public function bindParent($parent, $parentPropertyName = null)
+    {
+        $this->parent = $parent;
         return $this;
     }
 
@@ -77,8 +71,9 @@ abstract class PHPExcel_Style_Supervisor {
      *
      * @return boolean
      */
-    public function getIsSupervisor() {
-        return $this->_isSupervisor;
+    public function getIsSupervisor()
+    {
+        return $this->isSupervisor;
     }
 
     /**
@@ -86,8 +81,9 @@ abstract class PHPExcel_Style_Supervisor {
      *
      * @return PHPExcel_Worksheet
      */
-    public function getActiveSheet() {
-        return $this->_parent->getActiveSheet();
+    public function getActiveSheet()
+    {
+        return $this->parent->getActiveSheet();
     }
 
     /**
@@ -96,7 +92,8 @@ abstract class PHPExcel_Style_Supervisor {
      *
      * @return string E.g. 'A1'
      */
-    public function getSelectedCells() {
+    public function getSelectedCells()
+    {
         return $this->getActiveSheet()->getSelectedCells();
     }
 
@@ -106,22 +103,23 @@ abstract class PHPExcel_Style_Supervisor {
      *
      * @return string E.g. 'A1'
      */
-    public function getActiveCell() {
+    public function getActiveCell()
+    {
         return $this->getActiveSheet()->getActiveCell();
     }
 
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
-    public function __clone() {
+    public function __clone()
+    {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
-            if ((is_object($value)) && ($key != '_parent')) {
+            if ((is_object($value)) && ($key != 'parent')) {
                 $this->$key = clone $value;
             } else {
                 $this->$key = $value;
             }
         }
     }
-
 }

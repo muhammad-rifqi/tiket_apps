@@ -1,7 +1,7 @@
 <?php
 
 /**
- * PHPExcel
+ * PHPExcel_RichText_TextElement
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,54 +19,49 @@
  *
  * @category   PHPExcel
  * @package    PHPExcel_RichText
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt	LGPL
- * @version    1.8.0, 2014-03-02
+ * @copyright  Copyright (c) 2006 - 2015 PHPExcel (http://www.codeplex.com/PHPExcel)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ * @version    ##VERSION##, ##DATE##
  */
-
-/**
- * PHPExcel_RichText_TextElement
- *
- * @category   PHPExcel
- * @package    PHPExcel_RichText
- * @copyright  Copyright (c) 2006 - 2014 PHPExcel (http://www.codeplex.com/PHPExcel)
- */
-class PHPExcel_RichText_TextElement implements PHPExcel_RichText_ITextElement {
-
+class PHPExcel_RichText_TextElement implements PHPExcel_RichText_ITextElement
+{
     /**
      * Text
      *
      * @var string
      */
-    private $_text;
+    private $text;
 
     /**
      * Create a new PHPExcel_RichText_TextElement instance
      *
-     * @param 	string		$pText		Text
+     * @param     string        $pText        Text
      */
-    public function __construct($pText = '') {
+    public function __construct($pText = '')
+    {
         // Initialise variables
-        $this->_text = $pText;
+        $this->text = $pText;
     }
 
     /**
      * Get text
      *
-     * @return string	Text
+     * @return string    Text
      */
-    public function getText() {
-        return $this->_text;
+    public function getText()
+    {
+        return $this->text;
     }
 
     /**
      * Set text
      *
-     * @param 	$pText string	Text
+     * @param     $pText string    Text
      * @return PHPExcel_RichText_ITextElement
      */
-    public function setText($pText = '') {
-        $this->_text = $pText;
+    public function setText($pText = '')
+    {
+        $this->text = $pText;
         return $this;
     }
 
@@ -75,26 +70,29 @@ class PHPExcel_RichText_TextElement implements PHPExcel_RichText_ITextElement {
      *
      * @return PHPExcel_Style_Font
      */
-    public function getFont() {
+    public function getFont()
+    {
         return null;
     }
 
     /**
      * Get hash code
      *
-     * @return string	Hash code
+     * @return string    Hash code
      */
-    public function getHashCode() {
+    public function getHashCode()
+    {
         return md5(
-                $this->_text
-                . __CLASS__
+            $this->text .
+            __CLASS__
         );
     }
 
     /**
      * Implement PHP __clone to create a deep clone, not just a shallow copy.
      */
-    public function __clone() {
+    public function __clone()
+    {
         $vars = get_object_vars($this);
         foreach ($vars as $key => $value) {
             if (is_object($value)) {
@@ -104,5 +102,4 @@ class PHPExcel_RichText_TextElement implements PHPExcel_RichText_ITextElement {
             }
         }
     }
-
 }
