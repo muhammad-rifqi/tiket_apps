@@ -50,10 +50,11 @@ class Import extends CI_Controller {
                         $flag =false;
                         continue;
                       }
-                      $inserdata[$i]['first_name'] = $value['A'];
-                      $inserdata[$i]['last_name'] = $value['B'];
-                      $inserdata[$i]['email'] = $value['C'];
-                      $inserdata[$i]['contact_no'] = $value['D'];
+                      $inserdata[$i]['tiket_number'] = $value['A'];
+                      $inserdata[$i]['submitted_date'] = $value['B'];
+                      $inserdata[$i]['workshop'] = $value['C'];
+                      $inserdata[$i]['service'] = $value['D'];
+                      $inserdata[$i]['part'] = $value['E'];
                       $i++;
                     }               
                     $result = $this->import->importData($inserdata);   
