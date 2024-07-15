@@ -53,8 +53,10 @@ $route['default_controller'] = 'import/index';
 $route['edit/(:any)'] = 'import/edit/$1';
 $route['view/(:any)'] = 'import/view/$1';
 $route['delete/(:any)'] = 'import/delete/$1';
-
-
+$route['add'] = 'import/add';
+$route['api/list'] = 'import/api';
+$route['api/tiket'] = 'import/api_tiket_per_day';
+$route['api/workshop'] = 'import/api_tiket_workshop';
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

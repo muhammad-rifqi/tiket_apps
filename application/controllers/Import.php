@@ -11,7 +11,7 @@ class Import extends CI_Controller {
     }    
  
     public function index() {
-        $this->load->view('import');
+        $this->load->view('display');
     }
  
     public function importFile(){
@@ -43,27 +43,30 @@ class Import extends CI_Controller {
                     $objReader = PHPExcel_IOFactory::createReader($inputFileType);
                     $objPHPExcel = $objReader->load($inputFileName);
                     $allDataInSheet = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
-                    // $flag = true;
-                    // $i=0;
-                    // foreach ($allDataInSheet as $value) {
-                    //   if($flag){
-                    //     $flag =false;
-                    //     continue;
-                    //   }
-                    //   $inserdata[$i]['tiket_number'] = $value['A'];
-                    //   $inserdata[$i]['submitted_date'] = $value['B'];
-                    //   $inserdata[$i]['workshop'] = $value['C'];
-                    //   $inserdata[$i]['service'] = $value['D'];
-                    //   $inserdata[$i]['part'] = $value['E'];
-                    //   $i++;
-                    // }               
-                    // $result = $this->import->importData($inserdata);   
-                    // if($result){
-                    //   echo "Imported successfully";
-                    // }else{
-                    //   echo "ERROR !";
-                    // }             
-                    print_r($allDataInSheet);
+                    $flag = true;
+                    $i=0;
+                    foreach ($allDataInSheet as $value) {
+                      if($flag){
+                        $flag =false;
+                        continue;
+                      }
+
+                      $date = strtotime($value['B']);
+                      $new_date = date('Y-m-d', $date);
+
+                      $inserdata[$i]['tiket_number'] = $value['A'];
+                      $inserdata[$i]['submitted_date'] = $new_date;
+                      $inserdata[$i]['workshop'] = $value['C'];
+                      $inserdata[$i]['service'] = $value['D'];
+                      $inserdata[$i]['part'] = $value['E'];
+                      $i++;
+                    }               
+                    $result = $this->import->importData($inserdata);   
+                    if($result){
+                      echo "Imported successfully";
+                    }else{
+                      echo "ERROR !";
+                    }             
       
               } catch (Exception $e) {
                    die('Error loading file "' . pathinfo($inputFileName, PATHINFO_BASENAME)
@@ -75,8 +78,52 @@ class Import extends CI_Controller {
                  
                  
         }
-        $this->load->view('import');
+        return redirect(base_url('/'));
+    }
+
+    public function delete() {
+      $id = $this->uri->segment(2);
+      $this->import->deletedata($id);  
+      return redirect(base_url('/'));
+    }
+
+    public function add() {
+      $this->load->view('import');
+    }
+
+    public function view() {
+      $id = $this->uri->segment(2);
+      $result['detail'] = $this->import->viewdata($id);  
+      $this->load->view('detail', $result);
     }
      
+    public function api() {
+      $result = $this->import->apidata();  
+      echo json_encode($result);
+    }
+     
+    public function edit() {
+      $id = $this->uri->segment(2);
+      $result['detail'] = $this->import->viewdata($id);  
+      $this->load->view('edit', $result);
+    }
+
+
+    public function multiupload() {
+        $this->import->uploadmulti();
+        redirect(base_url());
+    }
+
+    public function api_tiket_per_day() {
+      $result = $this->import->tiket();  
+      echo json_encode($result);
+    }
+
+    
+    public function api_tiket_workshop() {
+      $result = $this->import->workshop();  
+      echo json_encode($result);
+    }
+
 }
 ?>

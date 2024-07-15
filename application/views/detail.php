@@ -8,12 +8,13 @@
 <body>
   <div class="container">
     <div class="col-md-12">
-    <form action="<?php echo base_url();?>import/importFile" method="post" enctype="multipart/form-data">
-        <h1> Upload excel file : </h1>
+        <h1> Detail Data  : </h1>
         <hr> 
-        <p> <input type="file" name="uploadFile" value="" class="form-control"/></p>
-        <p> <input type="submit" name="submit" value="Upload" class="btn btn-primary"/> <a href="<?= base_url();?> " class="btn btn-warning"> Kembali </a></p>
-    </form>
+        <p> TICKET NUMBER : <b> <?= $detail[0]['tiket_number'];?> </b> </p>
+        <p> SUBMITTED DATE : <b> <?= $detail[0]['submitted_date'];?> </b> </p>
+        <p> WORKSHOP : <b> <?= $detail[0]['workshop'];?> </b> </p>
+        <p> SERVICE : <b> <?= $detail[0]['service'];?> </b> </p>
+        <p> PART : <b> <?= $detail[0]['part'];?> </b> </p>
     </div>
   </div>
 </body>
